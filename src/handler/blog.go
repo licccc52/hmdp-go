@@ -2,9 +2,9 @@ package handler
 
 import (
 	"hmdp/src/dto"
+	"hmdp/src/middleware"
 	"hmdp/src/model"
 	"hmdp/src/service"
-	"hmdp/src/utils"
 	"net/http"
 	"strconv"
 
@@ -64,17 +64,28 @@ func (*BlogHandler) LikeBlog(c *gin.Context) {
 // @Description: query my blog
 // @Router: /blog/of/me [GET]
 func (*BlogHandler) QueryMyBlog(c *gin.Context) {
-	current := c.Query("current")
+	var current string
+	current = c.Query("current")
+
+	if current == "" {
+		current = "1"
+	}
+
 	currentPage, err := strconv.Atoi(current)
 	if err != nil {
 		logrus.Error("type transform failed!")
 		c.JSON(http.StatusOK, dto.Fail[string]("type transform failed!"))
 		return
 	}
-	if current == "" {
-		current = "1"
+
+	user, err := middleware.GetUserInfo(c)
+
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusOK, dto.Fail[string]("get user info failed!"))
+		return
 	}
-	user := utils.UserInfo.GetUserInfo()
+
 	blogs, err := service.BlogManager.QueryMyBlog(user.Id, currentPage)
 	if err != nil {
 		logrus.Error("page query failed!")
@@ -113,20 +124,20 @@ func (*BlogHandler) GetBlogById(c *gin.Context) {
 	idStr := c.Param("id")
 	if idStr == "" {
 		logrus.Error("id str is empty")
-		c.JSON(http.StatusOK , dto.Fail[string]("id str is empty"))
+		c.JSON(http.StatusOK, dto.Fail[string]("id str is empty"))
 		return
 	}
-	id,err := strconv.ParseInt(idStr , 10 , 64)
+	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		logrus.Error(err.Error())
-		c.JSON(http.StatusOK , dto.Fail[string]("type transform is failed!"))
+		c.JSON(http.StatusOK, dto.Fail[string]("type transform is failed!"))
 		return
 	}
-	blog , err := service.BlogManager.GetBlogById(id)
+	blog, err := service.BlogManager.GetBlogById(id)
 	if err != nil {
 		logrus.Error(err.Error())
-		c.JSON(http.StatusOK , dto.Fail[string]("get blog by id failed!"))
+		c.JSON(http.StatusOK, dto.Fail[string]("get blog by id failed!"))
 		return
 	}
-	c.JSON(http.StatusOK , dto.OkWithData(blog))
+	c.JSON(http.StatusOK, dto.OkWithData(blog))
 }

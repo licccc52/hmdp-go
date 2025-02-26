@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"hmdp/src/middleware"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,21 +13,25 @@ func ConfigRouter(r *gin.Engine) {
 		ctx.JSON(http.StatusOK, "pong")
 	})
 
-	blogController := r.Group("/blog")
+	blogController := r.Group("/blog", middleware.JWTAuth())
 
 	{
 		blogController.POST("", blogHandler.SaveBlog)
 		blogController.PUT("/like/:id", blogHandler.LikeBlog)
 		blogController.GET("/of/me", blogHandler.QueryMyBlog)
-		blogController.GET("/hot", blogHandler.QueryHotBlog)
 		blogController.GET("/:id", blogHandler.GetBlogById)
+	}
+
+	blogControllerWithOutMid := r.Group("/blog")
+	{
+		blogControllerWithOutMid.GET("/hot", blogHandler.QueryHotBlog)
 	}
 
 	// blogCommentsController := r.Group("/blog-comments")
 
 	// followController := r.Group("/follow")
 
-	shopController := r.Group("/shop")
+	shopController := r.Group("/shop", middleware.JWTAuth())
 
 	{
 		shopController.GET("/:id", shopHandler.QueryShopById)
@@ -42,24 +47,29 @@ func ConfigRouter(r *gin.Engine) {
 		shopTypeController.GET("/list", shopTypeHandler.QueryShopTypeList)
 	}
 
-	uploadController := r.Group("/upload")
+	uploadController := r.Group("/upload", middleware.JWTAuth())
 
 	{
 		uploadController.POST("/blog", uploadHandler.UploadImage)
 		uploadController.GET("/blog/delete", uploadHandler.DeleteBlogImg)
 	}
 
-	userController := r.Group("/user")
+	userController := r.Group("/user", middleware.JWTAuth())
 
 	{
-		userController.POST("/code", userHandler.SendCode)
-		userController.POST("/login", userHandler.Login)
 		userController.POST("/logout", userHandler.Logout)
 		userController.GET("/me", userHandler.Me)
 		userController.GET("/info/:id", userHandler.Info)
 	}
 
-	voucherController := r.Group("/voucher")
+	userControllerWithOutMid := r.Group("/user")
+
+	{
+		userControllerWithOutMid.POST("/code", userHandler.SendCode)
+		userControllerWithOutMid.POST("/login", userHandler.Login)
+	}
+
+	voucherController := r.Group("/voucher", middleware.JWTAuth())
 
 	{
 		voucherController.POST("", voucherHandler.AddVoucher)

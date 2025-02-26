@@ -25,3 +25,13 @@ func (user *User) GetUserById(id int64) (User , error) {
 	err := mysql.GetMysqlDB().Table(user.TableName()).Where("id = ?" , id).First(&u).Error
 	return u , err
 }
+
+func (user *User) GetUserByPhone(phone string) (error) {
+	err := mysql.GetMysqlDB().Table(user.TableName()).Where("phone = ?" , phone).First(user).Error
+	return err
+}
+
+func (user *User) SaveUser() (error) {
+	err := mysql.GetMysqlDB().Table(user.TableName()).Create(user).Error
+	return err
+}
