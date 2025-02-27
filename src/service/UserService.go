@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"errors"
-	"hmdp/src/config/redis"
+	redisClient "hmdp/src/config/redis"
 	"hmdp/src/dto"
 	"hmdp/src/middleware"
 	"hmdp/src/model"
@@ -30,7 +30,7 @@ func (*UserService) SaveCode(phone string) error {
 	verifyCode := utils.RandomUtil.GenerateVerifyCode()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	err := redis.GetRedisClient().Set(ctx, utils.LOGIN_CODE_KEY+phone, verifyCode, time.Duration(time.Minute*utils.LOGIN_VERIFY_CODE_TTL)).Err()
+	err := redisClient.GetRedisClient().Set(ctx, utils.LOGIN_CODE_KEY+phone, verifyCode, time.Duration(time.Minute*utils.LOGIN_VERIFY_CODE_TTL)).Err()
 	return err
 }
 
@@ -50,7 +50,7 @@ func (*UserService) Login(loginInfo *dto.LoginFormDto) (string, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	cacheCode, err := redis.GetRedisClient().Get(ctx, utils.LOGIN_CODE_KEY+loginInfo.Phone).Result()
+	cacheCode, err := redisClient.GetRedisClient().Get(ctx, utils.LOGIN_CODE_KEY+loginInfo.Phone).Result()
 	if err != nil {
 		return "", err
 	}

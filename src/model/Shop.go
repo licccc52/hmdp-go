@@ -33,8 +33,8 @@ func(*Shop) TableName() string {
 	return SHOP_TABLE_NAME 
 }
 
-func (shop *Shop) QueryShopById() error {
-	err := mysql.GetMysqlDB().Model(shop).First(shop).Error
+func (shop *Shop) QueryShopById(id int64) error {
+	err := mysql.GetMysqlDB().Model(shop).Where("id = ?" , id).First(shop).Error
 	return err
 }
 

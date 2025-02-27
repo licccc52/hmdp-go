@@ -18,6 +18,7 @@ var shopHandler *ShopHandler
 
 // @Descirption: query shop by id
 // @Router: /shop/{id} [GET]
+// TODO add cache
 func (*ShopHandler) QueryShopById(c *gin.Context) {
 	idStr := c.Param("id")
 	if idStr == "" {
@@ -31,7 +32,11 @@ func (*ShopHandler) QueryShopById(c *gin.Context) {
 		c.JSON(http.StatusOK, dto.Fail[string]("transform type failed!"))
 		return
 	}
-	shop, err := service.ShopManager.QueryShopById(id)
+	// shop, err := service.ShopManager.QueryShopById(id)
+
+	// shop , err := service.ShopManager.QueryShopByIdWithCache(id)
+	shop, err := service.ShopManager.QueryShopByIdWithCacheNull(id)
+
 	if err != nil {
 		logrus.Error("query failed!")
 		c.JSON(http.StatusOK, dto.Fail[string]("query failed!"))
@@ -69,7 +74,8 @@ func (*ShopHandler) UpdateShop(c *gin.Context) {
 		c.JSON(http.StatusOK, dto.Fail[string]("failed to bind data"))
 		return
 	}
-	err = service.ShopManager.UpdateShop(&shop)
+	// err = service.ShopManager.UpdateShop(&shop)
+	err = service.ShopManager.UpdateShopWithCache(&shop)
 	if err != nil {
 		logrus.Error("failed to update shop")
 		c.JSON(http.StatusOK, dto.Fail[string]("failed to update shop"))
@@ -124,6 +130,7 @@ func (*ShopHandler) QueryShopByName(c *gin.Context) {
 	if name == "" {
 		name = "%%"
 	}
+
 	currentStr := c.Query("current")
 	if currentStr == "" {
 		currentStr = "1"
@@ -135,6 +142,7 @@ func (*ShopHandler) QueryShopByName(c *gin.Context) {
 		c.JSON(http.StatusOK, dto.Fail[string]("type transform failed"))
 		return
 	}
+
 	shops, err := service.ShopManager.QueryByName(name, current)
 	if err != nil {
 		logrus.Error("query shop by name failed!")
