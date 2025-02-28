@@ -10,8 +10,8 @@ import (
 const SECKILL_VOUCHER_NAME = "tb_seckill_voucher"
 
 type SecKillVoucher struct {
-	VoucherId  int64  `gorm:"primary;AUTO_INCREMENT;column:voucher_id" json:"voucherId"`
-	Stock      int    `gorm:"column:stock" json:"stock"`
+	VoucherId  int64     `gorm:"primary;AUTO_INCREMENT;column:voucher_id" json:"voucherId"`
+	Stock      int       `gorm:"column:stock" json:"stock"`
 	CreateTime time.Time `gorm:"column:create_time" json:"createTime"`
 	BeginTime  time.Time `gorm:"column:begin_time" json:"beginTime"`
 	EndTime    time.Time `gorm:"column:end_time" json:"endTime"`

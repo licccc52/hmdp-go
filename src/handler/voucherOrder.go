@@ -8,11 +8,10 @@ import (
 )
 
 type VoucherOrderHandler struct {
-
 }
 
 var voucherOrderHandler *VoucherOrderHandler
 
 func (*VoucherOrderHandler) SeckillVoucher(c *gin.Context) {
-	c.JSON(http.StatusOK , dto.Fail[string]("the function is not finished"))	
+	c.JSON(http.StatusOK, dto.Fail[string]("the function is not finished"))
 }

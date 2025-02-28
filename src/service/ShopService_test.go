@@ -6,6 +6,8 @@ import (
 	"hmdp/src/model"
 	"sync"
 	"testing"
+	"time"
+	_ "time"
 )
 
 // 建立热点 key
@@ -53,6 +55,7 @@ func TestHotKeyLogicExpired(t *testing.T) {
 	wg.Add(10)
 
 	for i := range 10 {
+		time.Sleep(time.Second)
 		go func(x int) {
 			defer wg.Done()
 			var shopInfo model.Shop
