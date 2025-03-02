@@ -5,6 +5,7 @@ const (
 	CACHE_SHOP_KEY = "cache:shop:"
 	CACHE_SHOP_LIST = "shop:list"
 	CACHE_LOCK_KEY = "shop:lock:"
+	SECKILL_STOCK_KEY = "seckill:stock:"
 )
 
 const (

@@ -77,9 +77,10 @@ func ConfigRouter(r *gin.Engine) {
 		voucherController.GET("/list/:shopId", voucherHandler.QueryVoucherOfShop)
 	}
 
-	voucherOrderController := r.Group("/voucher-order")
+	voucherOrderController := r.Group("/voucher-order", middleware.JWTAuth())
 
 	{
 		voucherOrderController.POST("/seckill/:id", voucherOrderHandler.SeckillVoucher)
 	}
+
 }

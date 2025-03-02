@@ -4,13 +4,14 @@ import (
 	"hmdp/src/config/mysql"
 	"time"
 
+	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm"
 )
 
 const SECKILL_VOUCHER_NAME = "tb_seckill_voucher"
 
 type SecKillVoucher struct {
-	VoucherId  int64     `gorm:"primary;AUTO_INCREMENT;column:voucher_id" json:"voucherId"`
+	VoucherId  int64     `gorm:"primary;column:voucher_id" json:"voucherId"`
 	Stock      int       `gorm:"column:stock" json:"stock"`
 	CreateTime time.Time `gorm:"column:create_time" json:"createTime"`
 	BeginTime  time.Time `gorm:"column:begin_time" json:"beginTime"`
@@ -24,4 +25,13 @@ func (*SecKillVoucher) TableName() string {
 
 func (sec *SecKillVoucher) AddSeckillVoucher() error {
 	return mysql.GetMysqlDB().Table(sec.TableName()).Create(sec).Error
+}
+
+func (sec *SecKillVoucher) QuerySeckillVoucherById(id int64) error {
+	return mysql.GetMysqlDB().Table(sec.TableName()).Where("voucher_id = ?", id).First(sec).Error
+}
+
+func (sec *SecKillVoucher) DecrVoucherStock(id int64 , tx *gorm.DB) error {
+	err := tx.Table(sec.TableName()).Where("voucher_id = ?", id).Where("stock > 0").Update("stock", gorm.Expr("stock - 1")).Error
+	return err
 }

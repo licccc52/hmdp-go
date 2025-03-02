@@ -56,7 +56,7 @@ func (*VoucherHandler) AddSecKillVoucher(c *gin.Context) {
 // @Description: query voucher by shop
 // @Router: /voucher/list/:shopId [GET]
 func (*VoucherHandler) QueryVoucherOfShop(c *gin.Context) {
-	idStr := c.Query("shopId")
+	idStr := c.Param("shopId")
 	if idStr == "" {
 		logrus.Error("the id is empty")
 		c.JSON(http.StatusOK, dto.Fail[string]("the id is empty"))
@@ -69,6 +69,7 @@ func (*VoucherHandler) QueryVoucherOfShop(c *gin.Context) {
 		return
 	}
 	vouchers, err := service.VoucherManager.QueryVoucherOfShop(id)
+
 	if err != nil {
 		logrus.Error("get voucher failed!")
 		c.JSON(http.StatusOK, dto.Fail[string]("get voucher failed!"))

@@ -44,7 +44,7 @@ func (*ShopService) SaveShop(shop *model.Shop) error {
 }
 
 func (*ShopService) UpdateShop(shop *model.Shop) error {
-	err := shop.UpdateShop()
+	err := shop.UpdateShop(mysql.GetMysqlDB())
 	return err
 }
 
@@ -109,7 +109,7 @@ func (*ShopService) UpdateShopWithCacheCallBack(db *gorm.DB, shop *model.Shop) e
 		}
 
 		// update the database
-		err = shop.UpdateShop()
+		err = shop.UpdateShop(tx)
 		if err != nil {
 			return err
 		}
