@@ -20,6 +20,8 @@ func ConfigRouter(r *gin.Engine) {
 		blogController.PUT("/like/:id", blogHandler.LikeBlog)
 		blogController.GET("/of/me", blogHandler.QueryMyBlog)
 		blogController.GET("/:id", blogHandler.GetBlogById)
+		blogController.GET("/likes/:id", blogHandler.QueryUserLiked)
+		blogController.GET("/of/follow", blogHandler.QueryBlogOfFollow)
 	}
 
 	blogControllerWithOutMid := r.Group("/blog")
@@ -83,4 +85,11 @@ func ConfigRouter(r *gin.Engine) {
 		voucherOrderController.POST("/seckill/:id", voucherOrderHandler.SeckillVoucher)
 	}
 
+	followContoller := r.Group("/follow", middleware.JWTAuth())
+
+	{
+		followContoller.PUT("/:id/:isFollow", followHanlder.Follow)
+		followContoller.GET("/common/:id", followHanlder.FollowCommons)
+		followContoller.GET("/or/not/:id", followHanlder.IsFollow)
+	}
 }

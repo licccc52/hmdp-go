@@ -35,3 +35,9 @@ func (user *User) SaveUser() (error) {
 	err := mysql.GetMysqlDB().Table(user.TableName()).Create(user).Error
 	return err
 }
+
+func (user *User) GetUsersByIds(ids []int64) ([]User , error) {
+	var users []User
+	err := mysql.GetMysqlDB().Table(user.TableName()).Where("id IN (?)" , ids).Find(&users).Error
+	return users , err
+}

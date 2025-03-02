@@ -22,6 +22,7 @@ var uploadHandler *UploadHandler
 // @Description: upload the image
 // @Router: /upload/blog [POST]
 func (*UploadHandler) UploadImage(c *gin.Context) {
+	logrus.Info("beign to upload image")
 	file, err := c.FormFile("file")
 	if err != nil {
 		logrus.Error("upload file failed!")
@@ -29,10 +30,13 @@ func (*UploadHandler) UploadImage(c *gin.Context) {
 		return
 	}
 	originName := file.Filename
+	logrus.Info(originName)
 	fileName := createNewFileName(originName)
+	logrus.Info(fileName)
+	logrus.Info(utils.UPLOADPATH + fileName)
 	err = c.SaveUploadedFile(file, utils.UPLOADPATH+fileName)
 	if err != nil {
-		logrus.Error("file upload failed!")
+		logrus.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, dto.Fail[string]("file upload failed!"))
 		return
 	}

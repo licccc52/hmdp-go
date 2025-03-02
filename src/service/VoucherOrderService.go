@@ -168,7 +168,6 @@ func SyncHandlerStream() {
 		}).Result()
 
 		if err != nil {
-			logrus.Error(err.Error())
 			handlePendingList()
 			continue
 		}
@@ -246,12 +245,10 @@ func createNewOrderNew(db *gorm.DB, voucherOrder model.VoucherOrder) error {
 }
 
 func handlePendingList() {
-	logrus.Info("into handle pending list")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	for {
-		logrus.Info("handle pending loop!!!")
 		msgs, err := redisClient.GetRedisClient().XReadGroup(ctx, &redisConfig.XReadGroupArgs{
 			Group:    "g1",
 			Consumer: "c1",
@@ -261,13 +258,11 @@ func handlePendingList() {
 		}).Result()
 
 		if err != nil {
-			logrus.Error(err.Error(), "pending")
 			break
 		}
 
 		// there is not msg in pending list
 		if len(msgs) == 1 && (len(msgs[0].Messages) == 0) {
-			logrus.Info("msg is empty , break")
 			break
 		}
 

@@ -6,6 +6,9 @@ const (
 	CACHE_SHOP_LIST = "shop:list"
 	CACHE_LOCK_KEY = "shop:lock:"
 	SECKILL_STOCK_KEY = "seckill:stock:"
+	BLOG_LIKE_KEY = "blog:like:"
+	FOLLOW_USER_KEY = "follow:"
+	FEED_KEY = "feed:"
 )
 
 const (

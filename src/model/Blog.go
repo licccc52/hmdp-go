@@ -1,10 +1,13 @@
 package model
 
 import (
+	"fmt"
 	"hmdp/src/config/mysql"
 	"hmdp/src/utils"
+	"strings"
 	"time"
 
+	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
 )
@@ -65,4 +68,26 @@ func (blog *Blog) QueryHots(current int) ([]Blog , error) {
 func (blog *Blog) GetBlogById(id int64) (error) {
 	err := mysql.GetMysqlDB().Where("id = ?" , id).First(blog).Error
 	return err
+}
+
+func (blog *Blog) DecrLike() (error) {
+	err := mysql.GetMysqlDB().Table(blog.TableName()).Where("id = ?" , blog.Id).Update("liked" , gorm.Expr("liked - ?" , 1)).Error
+	return err
+}
+
+func (blog *Blog) IncrLike() (error) {
+	err := mysql.GetMysqlDB().Table(blog.TableName()).Where("id = ?" , blog.Id).Update("liked" , gorm.Expr("liked + ?" , 1)).Error
+	return err
+}
+
+func (blog *Blog) QueryBlogByIds(ids []int64) ([]Blog , error) {
+	var blogs []Blog
+	idStrs := make([]string , len(ids))
+	for i , id := range ids {
+		idStrs[i] = fmt.Sprintf("%d" , id)
+	}
+	idsJoined := strings.Join(idStrs , ",")
+
+	err := mysql.GetMysqlDB().Where("id IN ?" , ids).Order(fmt.Sprintf("FIELD(id , %s)" , idsJoined)).Find(&blogs).Error
+	return blogs , err
 }

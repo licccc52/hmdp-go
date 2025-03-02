@@ -27,14 +27,22 @@ func (*BlogHandler) SaveBlog(c *gin.Context) {
 		c.JSON(http.StatusOK, dto.Fail[string]("insert failed!"))
 		return
 	}
-	var result dto.Result[int64]
-	result, err = service.BlogManager.SaveBlog(&blog)
+
+	user, err := middleware.GetUserInfo(c)
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusOK, dto.Fail[string]("failed to get user id"))
+		return
+	}
+	userId := user.Id
+
+	id, err := service.BlogManager.SaveBlog(userId, &blog)
 	if err != nil {
 		logrus.Error("[Blog handler] insert data into database failed!")
 		c.JSON(http.StatusOK, dto.Fail[string]("insert failed!"))
 		return
 	}
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, dto.OkWithData(id))
 }
 
 // @Description: modify the number of linked
@@ -52,13 +60,46 @@ func (*BlogHandler) LikeBlog(c *gin.Context) {
 		c.JSON(http.StatusOK, dto.Fail[string]("type transform failed!"))
 		return
 	}
-	err = service.BlogManager.LikeBlog(id)
+
+	user, err := middleware.GetUserInfo(c)
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusOK, dto.Fail[string]("get user info failed!"))
+		return
+	}
+
+	userId := user.Id
+
+	err = service.BlogManager.LikeBlog(id, userId)
+
 	if err != nil {
 		logrus.Error(err.Error())
 		c.JSON(http.StatusOK, dto.Fail[string]("like failed!"))
 		return
 	}
 	c.JSON(http.StatusOK, dto.Ok[string]())
+}
+
+// @Description: get user rank of the blog
+// @Reouter: /blog/likes/:id  [GET]
+func (*BlogHandler) QueryUserLiked(c *gin.Context) {
+	var idStr string
+	idStr = c.Param("id")
+	if idStr == "" {
+		logrus.Error("the id is empty")
+		c.JSON(http.StatusOK, dto.Fail[string]("the id is empty!"))
+		return
+	}
+
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	users, err := service.BlogManager.QueryUserLike(id)
+
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusOK, dto.Fail[string]("the type transform failed!"))
+		return
+	}
+	c.JSON(http.StatusOK, dto.OkWithData(users))
 }
 
 // @Description: query my blog
@@ -140,4 +181,46 @@ func (*BlogHandler) GetBlogById(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, dto.OkWithData(blog))
+}
+
+// @Description: get the blog info of followed people
+// @Router: /blog/of/follow [GET]
+func (*BlogHandler) QueryBlogOfFollow(c *gin.Context) {
+	lastIdStr := c.Query("lastId")
+	lastId, err := strconv.ParseInt(lastIdStr, 10, 64)
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusOK, dto.Fail[string]("type transform failed!"))
+		return
+	}
+
+	offsetStr := c.Query("offset")
+	if offsetStr == "" {
+		offsetStr = "1"
+	}
+
+	offset, err := strconv.Atoi(offsetStr)
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusOK, dto.Fail[string]("type transform failed!"))
+		return
+	}
+
+	user, err := middleware.GetUserInfo(c)
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusOK, dto.Fail[string]("failed to get user info"))
+		return
+	}
+
+	userId := user.Id
+
+	r, err := service.BlogManager.QueryBlogOfFollow(lastId, offset, userId)
+
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusOK, dto.Fail[string]("failed to get result"))
+		return
+	}
+	c.JSON(http.StatusOK, dto.OkWithData(r))
 }
