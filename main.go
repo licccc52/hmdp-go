@@ -19,5 +19,5 @@ func main() {
 }
 
 func test() {
-	//
+	//1
 }
