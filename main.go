@@ -17,3 +17,7 @@ func main() {
 
 	r.Run(":8081")
 }
+
+func test() {
+	//
+}
