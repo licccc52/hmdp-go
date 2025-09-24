@@ -1,14 +1,14 @@
 package utils
 
 const (
-	LOGIN_CODE_KEY = "login:code:"
-	CACHE_SHOP_KEY = "cache:shop:"
-	CACHE_SHOP_LIST = "shop:list"
-	CACHE_LOCK_KEY = "shop:lock:"
+	LOGIN_CODE_KEY    = "login:code:"
+	CACHE_SHOP_KEY    = "cache:shop:"
+	CACHE_SHOP_LIST   = "shop:list"
+	CACHE_LOCK_KEY    = "shop:lock:"
 	SECKILL_STOCK_KEY = "seckill:stock:"
-	BLOG_LIKE_KEY = "blog:like:"
-	FOLLOW_USER_KEY = "follow:"
-	FEED_KEY = "feed:"
+	BLOG_LIKE_KEY     = "blog:like:"
+	FOLLOW_USER_KEY   = "follow:"
+	FEED_KEY          = "feed:"
 )
 
 const (
@@ -16,6 +16,6 @@ const (
 )
 
 const (
-	LOGIN_VERIFY_CODE_TTL = 2
-	HOT_KEY_EXISTS_TIME = 10
+	LOGIN_VERIFY_CODE_TTL = 30
+	HOT_KEY_EXISTS_TIME   = 10
 )

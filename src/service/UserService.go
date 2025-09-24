@@ -8,6 +8,7 @@ import (
 	"hmdp/src/middleware"
 	"hmdp/src/model"
 	"hmdp/src/utils"
+	"strings"
 	"time"
 )
 
@@ -61,7 +62,9 @@ func (*UserService) Login(loginInfo *dto.LoginFormDto) (string, error) {
 
 	var user model.User
 	err = user.GetUserByPhone(loginInfo.Phone)
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "not found ") {
+		return "", err
+	} else if err != nil {
 		user.Phone = loginInfo.Phone
 		user.NickName = utils.USER_NICK_NAME_PREFIX + utils.RandomUtil.GenerateRandomStr(10)
 		user.CreateTime = time.Now()

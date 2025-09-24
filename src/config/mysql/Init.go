@@ -10,9 +10,9 @@ import (
 const (
 	DATABASE     string = "mysql"
 	USER         string = "root"
-	PASSWORD     string = "123456"
+	PASSWORD     string = "lichuang"
 	PORT         string = "3306"
-	DATABASENAME string = "hmdp"
+	DATABASENAME string = "heimadp"
 	ADDR         string = "127.0.0.1"
 )
 
