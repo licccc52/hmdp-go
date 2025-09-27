@@ -35,8 +35,9 @@ func (*ShopHandler) QueryShopById(c *gin.Context) {
 	// shop, err := service.ShopManager.QueryShopById(id)
 
 	// shop , err := service.ShopManager.QueryShopByIdWithCache(id)
-	shop, err := service.ShopManager.QueryShopByIdWithCacheNull(id)
-
+	//shop, err := service.ShopManager.QueryShopByIdWithCacheNull(id)
+	//shop, err := service.ShopManager.QueryShopByIDWithMutex(id, 1)
+	shop, err := service.ShopManager.QueryShopByIDWithLogicExpire(id)
 	if err != nil {
 		logrus.Error("query failed!")
 		c.JSON(http.StatusOK, dto.Fail[string]("query failed!"))

@@ -26,6 +26,7 @@ func Init() {
 		logrus.Error("get mysql DB failed!")
 		panic(err)
 	}
+	db.LogMode(true)
 
 	_defalutDB = db
 }

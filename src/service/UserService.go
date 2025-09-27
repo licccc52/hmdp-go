@@ -63,7 +63,12 @@ func (*UserService) Login(loginInfo *dto.LoginFormDto) (string, error) {
 	var user model.User
 	err = user.GetUserByPhone(loginInfo.Phone)
 	if err != nil && strings.Contains(err.Error(), "not found ") {
-		return "", err
+		user.Phone = loginInfo.Phone
+		user.NickName = loginInfo.Phone
+		err = user.SaveUser()
+		if err != nil {
+			return "", err
+		}
 	} else if err != nil {
 		user.Phone = loginInfo.Phone
 		user.NickName = utils.USER_NICK_NAME_PREFIX + utils.RandomUtil.GenerateRandomStr(10)

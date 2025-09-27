@@ -28,6 +28,7 @@ type Shop struct {
 	CreateTime time.Time `gorm:"column:create_time" json:"createTime"`
 	UpdateTime time.Time `gorm:"column:update_time" json:"updateTime"`
 	Distance   float64   `gorm:"-" json:"distance"`
+	ExpireTime time.Time `json:"expireTime"`
 }
 
 func (*Shop) TableName() string {
