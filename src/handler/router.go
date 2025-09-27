@@ -82,7 +82,8 @@ func ConfigRouter(r *gin.Engine) {
 	voucherOrderController := r.Group("/voucher-order", middleware.JWTAuth())
 
 	{
-		voucherOrderController.POST("/seckill/:id", voucherOrderHandler.SeckillVoucher)
+		//voucherOrderController.POST("/seckill/:id", voucherOrderHandler.SeckillVoucher)
+		voucherOrderController.POST("/seckill/:id", voucherOrderHandler.SeckillVoucher2)
 	}
 
 	followContoller := r.Group("/follow", middleware.JWTAuth())

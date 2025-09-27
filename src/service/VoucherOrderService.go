@@ -289,3 +289,51 @@ func handlePendingList() {
 		}
 	}
 }
+
+const SeckillVoucherOrder = "order"
+
+func (vo *VoucherOrderService) SeckillVoucher_1(voucherId int64, userId int64) error {
+	var SecKillVoucherInfo model.SecKillVoucher
+	err := SecKillVoucherInfo.QuerySeckillVoucherById(voucherId)
+	if err != nil {
+		return err
+	}
+	if SecKillVoucherInfo.BeginTime.After(time.Now()) {
+		return errors.New("seckill not start")
+	}
+
+	if SecKillVoucherInfo.EndTime.Before(time.Now()) {
+		return errors.New("seckill is end")
+	}
+
+	if SecKillVoucherInfo.Stock < 1 {
+		return errors.New("stock is 0")
+	}
+
+	//削减库存
+	err = mysql.GetMysqlDB().Model(&SecKillVoucherInfo).Where("voucher_id = ? And stock > 0", voucherId).Update("stock", gorm.Expr("stock-1")).Error
+	if err != nil {
+		return err
+	}
+	//创建订单
+	var voucherOrder model.VoucherOrder
+	orderId, err := utils.RedisWork.NextId(SeckillVoucherOrder)
+	if err != nil {
+		return err
+	}
+	voucherOrder.Id = orderId
+	voucherOrder.UserId = userId
+	voucherOrder.VoucherId = voucherId
+	voucherOrder.PayType = 1
+	voucherOrder.VoucherId = voucherId
+	voucherOrder.PayTime = time.Now()
+	voucherOrder.UseTime = time.Now()
+	voucherOrder.RefundTime = time.Now()
+	voucherOrder.UpdateTime = time.Now()
+	voucherOrder.CreateTime = time.Now()
+	err = mysql.GetMysqlDB().Create(&voucherOrder).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
