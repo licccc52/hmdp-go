@@ -24,11 +24,11 @@ var ID_PREFIX = uuid.New().String() + "-"
 
 func (s *SimpleRedisLock) TryLock(expireTime int64) bool {
 	key := KEY_PREFIX + s.Name
-	id := ID_PREFIX + strconv.FormatUint(GetGoroutinueID(), 10)
+	id := ID_PREFIX + strconv.FormatUint(GetGoroutinueID(), 10) // key用uuid 拼接 线程id表示, 保证只能释放自己的锁
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	// value : 用id ,作为线程标识
 	flag, err := redisClient.GetRedisClient().SetNX(ctx, key, id, time.Duration(expireTime)*time.Second).Result()
-
 	if err != nil {
 		return false
 	}
@@ -59,15 +59,15 @@ func (s *SimpleRedisLock) Unlock() {
 		end
 	`)
 
-	keys := []string{KEY_PREFIX + s.Name}
-	realId := ID_PREFIX + strconv.FormatUint(GetGoroutinueID(), 10)
+	keys := []string{KEY_PREFIX + s.Name}                           // name = userId
+	realId := ID_PREFIX + strconv.FormatUint(GetGoroutinueID(), 10) //当前线程的ID
 	var values []interface{}
 	values = append(values, realId)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	script.Run(ctx, redisClient.GetRedisClient(), keys, values...)
+	script.Run(ctx, redisClient.GetRedisClient(), keys, values...) //lua脚本 keys[], argv[]两个数组包含了所有参数
 }
 
 func GetGoroutinueID() uint64 {

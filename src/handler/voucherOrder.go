@@ -50,18 +50,22 @@ var voucherOrderHandler *VoucherOrderHandler
 func (*VoucherOrderHandler) SeckillVoucher2(c *gin.Context) {
 	voucherId := c.Param("id")
 	if voucherId == "" {
-		c.JSON(http.StatusOK, dto.Fail[string]("the id is empty!"))
+		c.JSON(http.StatusBadRequest, dto.Fail[string]("the id is empty!"))
 		return
 	}
 
 	id, err := strconv.ParseInt(voucherId, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusOK, dto.Fail[string]("the id is invalid!"))
+		c.JSON(http.StatusBadRequest, dto.Fail[string]("the id is invalid!"))
 	}
 
 	userInfo, err := middleware.GetUserInfo(c)
 	if err != nil {
-		c.JSON(http.StatusOK, dto.Fail[string](err.Error()))
+		c.JSON(http.StatusBadRequest, dto.Fail[string](err.Error()))
 	}
 	err = service.VoucherOrderManager.SeckillVoucher_1(id, userInfo.Id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.Fail[string](err.Error()))
+	}
+	c.JSON(http.StatusOK, dto.Ok[string])
 }

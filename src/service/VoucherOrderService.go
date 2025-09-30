@@ -309,14 +309,33 @@ func (vo *VoucherOrderService) SeckillVoucher_1(voucherId int64, userId int64) e
 	if SecKillVoucherInfo.Stock < 1 {
 		return errors.New("stock is 0")
 	}
+	// 多集群模式(一人一单), 需要添加分布式锁
+	var redisLock utils.SimpleRedisLock
+	userIdStr := strconv.FormatInt(userId, 10)
+	redisLock.Name = "order:" + userIdStr
+	success := redisLock.TryLock(2000)
+	if !success {
+		return errors.New("不允许重复下单, 一人只能下载一单.")
+	}
+	defer redisLock.Unlock()
+
+	// 一人一单: 判断订单是否存在
+	var voucherOrder model.VoucherOrder
+	res := mysql.GetMysqlDB().Model(voucherOrder).Where("user_id = ? And voucher_id = ?", userId, voucherId).First(&voucherOrder)
+	if res.RowsAffected != 0 {
+		return errors.New("voucher already exist")
+	}
 
 	//削减库存
-	err = mysql.GetMysqlDB().Model(&SecKillVoucherInfo).Where("voucher_id = ? And stock > 0", voucherId).Update("stock", gorm.Expr("stock-1")).Error
-	if err != nil {
-		return err
+	res = mysql.GetMysqlDB().Model(&SecKillVoucherInfo).Where("voucher_id = ? And stock > 0", voucherId).Update("stock", gorm.Expr("stock-1"))
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		return errors.New("stock update failed due to concurrency")
 	}
 	//创建订单
-	var voucherOrder model.VoucherOrder
 	orderId, err := utils.RedisWork.NextId(SeckillVoucherOrder)
 	if err != nil {
 		return err
